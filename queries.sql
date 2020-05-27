@@ -70,3 +70,115 @@ UPDATE "Employees" SET "Salary" = 500 WHERE "JobPosition" = 'Cook';
 
 -- //adding an ID 
  ALTER TABLE "Employees" ADD COLUMN "Id" SERIAL PRIMARY KEY;
+
+
+
+--  2nd day of homework
+
+CREATE TABLE "Departments"
+(
+  "Id"              SERIAL PRIMARY KEY,
+  "DepartmentName"  TEXT,
+  "Buiding"         TEXT
+);
+
+-- ALTER TABLE "Movies" ADD COLUMN "RatingId" INTEGER NULL REFERENCES "Ratings" ("Id");
+ALTER TABLE "Employees" ADD COLUMN "DepartmentId" INTEGER NULL REFERENCES "Departments" ("Id");
+
+-- Add product Table 
+CREATE TABLE "Orders"
+(
+  "Id"              SERIAL PRIMARY KEY,
+  "OrderNumber"     TEXT,
+  "DatePlaced"      TIMESTAMP,
+  "EMAIL"           TEXT
+);
+
+-- Add table products
+CREATE TABLE "Products"
+(
+  "Price"           DOUBLE PRECISION,
+  "Name"            TEXT,
+  "Description"     TEXT,
+  "QuantityInStock" INT
+);
+
+-- relate the 2 tables we created 
+ALTER TABLE "Products" ADD COLUMN "Id" SERIAL PRIMARY KEY;
+
+CREATE TABLE "ProductOrders"
+(
+  "Id"              SERIAL PRIMARY KEY,
+  "OrderId"         INTEGER REFERENCES "Orders" ("Id"),
+  "ProductsId"      INTEGER REFERENCES "Products" ("Id"),
+  "OrderQuantity"   INT
+);
+
+
+INSERT INTO "Departments" ("DepartmentName", "Building")
+VALUES ('Development', 'Main');
+
+INSERT INTO "Departments" ("DepartmentName", "Building")
+VALUES ('Marketing', 'North');
+
+INSERT INTO "Employees" ("FullName", "Salary", "JobPosition", "PhoneExtension", "IsPartTime", "DepartmentId")
+VALUES ('Tim Smith', 40000, 'Programer', 123, 'false', 1);
+
+INSERT INTO "Employees" ("FullName", "Salary", "JobPosition", "PhoneExtension", "IsPartTime", "DepartmentId")
+VALUES ('Barbara Ramsey', 80000, 'Manager', 234, 'false', 1);
+
+INSERT INTO "Employees" ("FullName", "Salary", "JobPosition", "PhoneExtension", "IsPartTime", "DepartmentId")
+VALUES ('Tom Jones', 32000, 'Admin', 456, 'true', 2);
+
+INSERT INTO "Products" ("Price", "Name", "Description", "QuantityInStock")
+VALUES (12.45, 'Widget', 'The Original Widget', 100);
+
+INSERT INTO "Products" ("Price", "Name", "Description", "QuantityInStock")
+VALUES (99.99, 'Flowbee', 'Perfect for haircuts', 3);
+
+-- inserting new order X529
+INSERT INTO "Orders" ("OrderNumber", "DatePlaced", "EMAIL")
+VALUES ('X529','2020-01-01 16:55:00' ,'person@example.com');
+
+--  Add an order quantity of 3 for the product named Widget to the order X529
+INSERT INTO "ProductOrders" ("OrderId", "ProductsId", "OrderQuantity") VALUES (2,1,3);
+
+
+--  Add an order quantity of 2 for the product named Flowbee to the order X529
+INSERT INTO "ProductOrders" ("OrderId", "ProductsId", "OrderQuantity") VALUES (2,2,2);
+
+SELECT "ProductOrders"."Id", "Products"."Name", "Orders"."OrderNumber", "ProductOrders"."OrderQuantity", "Orders"."Id"
+FROM "Orders"
+Join "ProductOrders" ON "ProductOrders"."OrderId" = "Orders"."Id"
+Join "Products" ON "Products"."Id" = "ProductOrders"."ProductsId";
+
+--  Given a department id, return all employees in the department.
+CREATE TABLE "Departments"
+(
+  "Id"              SERIAL PRIMARY KEY,
+  "DepartmentName"  TEXT,
+  "Buiding"         TEXT
+);
+
+--  Given a department id, return all employees in the department.
+SELECT "Employees"."FullName", "Departments"."Id"
+FROM "Employees"
+JOIN "Departments" ON "Employees"."DepartmentId" = "Departments"."Id";
+
+
+--  Given a department name, return all the phone extensions.
+SELECT "Departments"."DepartmentName", "Employees"."PhoneExtension"
+FROM "Employees"
+JOIN "Departments" ON "Employees"."DepartmentId" = "Departments"."Id";
+
+--  Find all orders that contain the product id of 2.
+SELECT "Products"."Name", "Orders"."OrderNumber", "ProductOrders"."OrderQuantity", "Products"."Id"
+FROM "Orders"
+Join "ProductOrders" ON "ProductOrders"."OrderId" = "Orders"."Id"
+Join "Products" ON "Products"."Id" = 2;
+
+
+-- Delete 
+DELETE FROM "ProductOrders" WHERE "ProductsId" = 2 AND "OrderId" = 2;
+
+
